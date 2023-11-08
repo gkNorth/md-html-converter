@@ -12,10 +12,15 @@ export class AppController {
     @Res() res: Response
   ): Promise<any> {
     let returnValue;
-    if (reqValues.isMdToHtml) {
-      returnValue = this.appService.geHtmlConvertedFromMarkdown({reqValues});
+    const isUrl = reqValues?.url
+    if (isUrl) {
+      returnValue = await this.appService.getMarkDownConvertedFromWebPage({reqValues});
     } else {
-      returnValue = this.appService.getMarkdownConvertedFromHtml({reqValues});
+      if (reqValues.isMdToHtml) {
+        returnValue = this.appService.getHtmlConvertedFromMarkdown({reqValues});
+      } else {
+        returnValue = this.appService.getMarkdownConvertedFromHtml({reqValues});
+      }
     }
     res.send(returnValue);
   }
