@@ -10,16 +10,20 @@ export class AppController {
   async getMarkdownConvertedFromHtml(
     @Body() reqValues,
     @Res() res: Response
-  ): Promise<any> {
-    let returnValue;
-    const isUrl = reqValues?.url
+  ): Promise<void> {
+    if (!reqValues) {
+      res.send('エラーが発生しました。');
+      return
+    }
+    let returnValue: string = '';
+    const isUrl = !!reqValues?.url
     if (isUrl) {
-      returnValue = await this.appService.getMarkDownConvertedFromWebPage({reqValues});
+      returnValue = await this.appService.getMarkDownConvertedFromWebPage({ reqValues });
     } else {
       if (reqValues.isMdToHtml) {
-        returnValue = this.appService.getHtmlConvertedFromMarkdown({reqValues});
+        returnValue = this.appService.getHtmlConvertedFromMarkdown({ reqValues });
       } else {
-        returnValue = this.appService.getMarkdownConvertedFromHtml({reqValues});
+        returnValue = this.appService.getMarkdownConvertedFromHtml({ reqValues });
       }
     }
     res.send(returnValue);

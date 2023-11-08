@@ -6,17 +6,20 @@ import puppeteer from 'puppeteer';
 
 @Injectable()
 export class AppService {
-  getMarkdownConvertedFromHtml({reqValues}): string {
+  getMarkdownConvertedFromHtml({ reqValues }: { reqValues: TextValue }): string {
     // const html = fs.readFileSync('src/data/index.html', 'utf8');
     const md = NodeHtmlMarkdown.translate(reqValues.htmlValue);
     return md;
   }
-  getHtmlConvertedFromMarkdown({reqValues}): string {
+  getHtmlConvertedFromMarkdown({ reqValues }: { reqValues: TextValue }): string {
     const html = marked.parse(reqValues.htmlValue);
     return html;
   }
-  async getMarkDownConvertedFromWebPage({reqValues}): Promise<any> {
-    const browser = await puppeteer.launch({ headless: true });
+  async getMarkDownConvertedFromWebPage({
+    reqValues
+  }: { reqValues: UrlValue }): Promise<string> {
+    
+    const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
     await page.goto(reqValues.url);
     const html = await page.evaluate(() => document.documentElement.outerHTML)
