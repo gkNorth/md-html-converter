@@ -14,3 +14,5 @@
 # # export PATH="${PATH}:/opt/render/project/.render/chrome/opt/google/chrome"
 
 # # add your own build commands...
+
+which chromium-browser
