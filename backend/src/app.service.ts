@@ -30,7 +30,7 @@ export class AppService {
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     });
     const page = await browser.newPage();
-    await page.goto(reqValues.url);
+    await page.goto(reqValues.url, { waitUntil: 'load' });
     const html = await page.evaluate(() => document.documentElement.outerHTML)
     await browser.close();
 
