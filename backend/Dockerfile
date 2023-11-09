@@ -1,15 +1,3 @@
-# FROM ghcr.io/puppeteer/puppeteer:19.7.2
-
-# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-#     PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
-
-# WORKDIR /usr/src/app
-
-# COPY package*.json ./
-# RUN npm ci
-# COPY . .
-# CMD [ "nest", "index.js" ]
-
 # ステージ1: ビルド環境を構築
 FROM node:18.18.0-alpine AS build
 WORKDIR /usr/src/app
@@ -18,50 +6,33 @@ RUN yarn install --frozen-lockfile
 COPY . .
 RUN yarn build
 
-FROM node:20@sha256:cb7cd40ba6483f37f791e1aace576df449fc5f75332c19ff59e2c6064797160e
-
-# Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
-# Note: this installs the necessary libs to make the bundled version of Chrome that Puppeteer
-# installs, work.
-RUN apt-get update \
-    && apt-get install -y wget gnupg \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/googlechrome-linux-keyring.gpg \
-    && sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/googlechrome-linux-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-khmeros fonts-kacst fonts-freefont-ttf libxss1 dbus dbus-x11 \
-      --no-install-recommends \
-    && service dbus start \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd -r pptruser && useradd -rm -g pptruser -G audio,video pptruser
-
-USER pptruser
-
-WORKDIR /home/pptruser
-
-COPY puppeteer-browsers-latest.tgz puppeteer-latest.tgz puppeteer-core-latest.tgz ./
-
-ENV DBUS_SESSION_BUS_ADDRESS autolaunch:
-
-# Install @puppeteer/browsers, puppeteer and puppeteer-core into /home/pptruser/node_modules.
-RUN npm i ./puppeteer-browsers-latest.tgz ./puppeteer-core-latest.tgz ./puppeteer-latest.tgz \
-    && rm ./puppeteer-browsers-latest.tgz ./puppeteer-core-latest.tgz ./puppeteer-latest.tgz \
-    && (node -e "require('child_process').execSync(require('puppeteer').executablePath() + ' --credits', {stdio: 'inherit'})" > THIRD_PARTY_NOTICES)
-
-CMD ["google-chrome-stable"]
-
-# FROM ghcr.io/puppeteer/puppeteer:21.5.0
-# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-#     PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
-# WORKDIR /usr/src/app
-# COPY package.json yarn.lock ./
-# RUN yarn install --frozen-lockfile
-# COPY . .
-
 # ステージ2: 実行環境を構築
 FROM node:18.18.0-alpine
 WORKDIR /usr/src/app
+
+# Puppeteerの依存関係をインストール
+RUN apk update \
+    && apk add --no-cache \
+      chromium \
+      nss \
+      freetype \
+      freetype-dev \
+      harfbuzz \
+      ca-certificates \
+      ttf-freefont \
+      nodejs \
+      yarn
+
+# Puppeteer用の環境変数を設定
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# ビルドステージから必要なファイルをコピー
 COPY --from=build /usr/src/app/dist ./dist
 COPY package.json yarn.lock ./
+
+# 本番用のnode_modulesをインストール
 RUN yarn install --production --frozen-lockfile
+
 EXPOSE 3000
 CMD ["node", "dist/main"]
