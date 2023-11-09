@@ -77,6 +77,9 @@ export default function Form() {
               ※Webページからの変換の場合は、必ずHTML →
               Markdownへの変換になります
             </p>
+            <p className="text-sm text-gray-600">
+              ※ページ読み込み、サーバー立ち上げなどで1分以上表示されないケースがあります
+            </p>
           </div>
         ) : (
           <textarea
