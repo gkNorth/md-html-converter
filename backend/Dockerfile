@@ -34,5 +34,7 @@ COPY package.json yarn.lock ./
 # 本番用のnode_modulesをインストール
 RUN yarn install --production --frozen-lockfile
 
+RUN which chromium-browser || true
+
 EXPOSE 3000
 CMD ["node", "dist/main"]
