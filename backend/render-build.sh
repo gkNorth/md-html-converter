@@ -12,6 +12,7 @@ if [[ ! -d $STORAGE_DIR/chrome ]]; then
   dpkg -x ./google-chrome-stable_current_amd64.deb $STORAGE_DIR/chrome
   rm ./google-chrome-stable_current_amd64.deb
   cd $HOME/project/src # Make sure we return to where we were
+  chmod -R a+rwx /opt/render/project/.render/chrome
 else
   echo "...Using Chrome from cache"
 fi
