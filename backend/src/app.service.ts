@@ -27,10 +27,7 @@ export class AppService {
         "--single-process",
         "--no-zygote",
       ],
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
     });
     const page = await browser.newPage();
     await page.goto(reqValues.url);
