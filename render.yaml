@@ -1,0 +1,20 @@
+services:
+- type: web
+  name: nextjs-service
+  env: node
+  buildCommand: "cd frontend && yarn && yarn build"
+  startCommand: "cd frontend && yarn start"
+  envVars:
+    - key: NODE_ENV
+      value: production
+  port: 3000
+
+- type: web
+  name: nestjs-service
+  env: node
+  buildCommand: "cd backend && yarn"
+  startCommand: "cd backend && yarn start"
+  envVars:
+    - key: NODE_ENV
+      value: production
+  port: 8000
