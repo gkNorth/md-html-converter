@@ -19,7 +19,7 @@ export class AppService {
     reqValues
   }: { reqValues: UrlValue }): Promise<string> {
     
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.goto(reqValues.url);
     const html = await page.evaluate(() => document.documentElement.outerHTML)
