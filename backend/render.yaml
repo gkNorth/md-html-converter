@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: markdown-html-converter-api
+    env: docker
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
